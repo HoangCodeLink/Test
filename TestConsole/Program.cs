@@ -12,7 +12,7 @@ try
     Console.WriteLine("Start setup");
     var endpoint = "localhost";
     // This uses the default Neptune and Gremlin port, 8182
-    var gremlinServer = new GremlinServer(endpoint, 8182, false);
+    var gremlinServer = new GremlinServer(endpoint);
     var gremlinClient = new GremlinClient(gremlinServer);
     var remoteConnection = new DriverRemoteConnection(gremlinClient, "g");
     var g = Traversal().WithRemote(remoteConnection);
@@ -42,7 +42,7 @@ try
         g.AddE(edge.Label)
             .From(g.V().Has("id", edge.From).Next())
             .To(g.V().Has("id", edge.To).Next())
-            .Property(nameof(edge.Id), edge.Id)
+            .Property("id", edge.Id)
             .Property(nameof(edge.Distance), edge.Distance)
             .Iterate();
     }
