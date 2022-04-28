@@ -18,13 +18,12 @@ try
     var g = Traversal().WithRemote(remoteConnection);
     Console.WriteLine("Connected");
 
-    var nodes = CsvUtils.GetList<Node>("../../../air-routes-latest-nodes.csv");
-    var nodeCount = 0;
-    Console.WriteLine(nodes.Count);
+    var count = 0;
+    var nodes = CsvUtils.GetList<Node>("air-routes-latest-nodes.csv");
     foreach (var node in nodes)
     {
-        nodeCount++;
-        Console.Write($"\r{(nodeCount / nodes.Count):0.##}%");
+        count++;
+        Console.Write($"\r{decimal.Divide(count * 100, nodes.Count):0.00}%");
         g.AddV(node.Label)
             .Property("id", node.Id)
             .Property(nameof(node.Author), node.Author)
@@ -32,17 +31,22 @@ try
             .Property(nameof(node.Country), node.Country)
             .Iterate();
     }
+    Console.WriteLine();
 
-    var edges = CsvUtils.GetList<Edge>("../../../air-routes-latest-edges.csv");
+    count = 0;
+    var edges = CsvUtils.GetList<Edge>("air-routes-latest-edges.csv");
     foreach (var edge in edges)
     {
+        count++;
+        Console.Write($"\r{decimal.Divide(count * 100, edges.Count):0.00}%");
         g.AddE(edge.Label)
-            .From(edge.From + "")
-            .To(edge.To + "")
+            .From(g.V().Has("id", edge.From).Next())
+            .To(g.V().Has("id", edge.To).Next())
             .Property(nameof(edge.Id), edge.Id)
             .Property(nameof(edge.Distance), edge.Distance)
             .Iterate();
     }
+    Console.WriteLine();
 
     // g.AddV("Person").Property("Name", "Justin").Iterate();
     // g.AddV("Custom Label").Property("Name", "Custom id vertex 1").Iterate();
